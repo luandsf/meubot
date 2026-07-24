@@ -9,9 +9,6 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# Caminho do arquivo da imagem salva na raiz do GitHub
-PHOTO_PATH = "banner.png"
-
 # Link do seu grupo
 GROUP_LINK = "https://t.me/tipslucrativas1"
 
@@ -26,22 +23,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Abre o arquivo de imagem do próprio servidor (sem depender de URL)
-    if os.path.exists(PHOTO_PATH):
-        with open(PHOTO_PATH, 'rb') as photo_file:
-            await context.bot.send_photo(
-                chat_id=update.effective_chat.id,
-                photo=photo_file,
-                caption=caption_text,
-                reply_markup=reply_markup
-            )
-    else:
-        # Se por algum motivo o arquivo não estiver lá, envia o texto com o botão
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=caption_text,
-            reply_markup=reply_markup
-        )
+    # Envia a mensagem direta com o botão
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=caption_text,
+        reply_markup=reply_markup
+    )
 
 def main():
     token = os.environ.get("TELEGRAM_TOKEN")
