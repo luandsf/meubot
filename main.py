@@ -1,19 +1,27 @@
 import os
 import uuid
+from threading import Thread
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultPhoto
 from telegram.ext import Application, InlineQueryHandler
 
-# Pega o token configurado no Render / Servidor
+# Servidor simples para o Render aceitar o plano Free
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot Ativo!")
+
+def run_server():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(('0.0.0.0', port), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
 TOKEN = os.environ.get("TELEGRAM_TOKEN")
-
-# Link do seu grupo no Telegram
 LINK_DO_GRUPO = "https://t.me/tipslucrativas1"
-
-# Link direto da sua imagem no Imgur
 URL_DA_IMAGEM = "https://i.imgur.com/vH9XgGj.png"
 
 async def inline_query(update, context):
-    # Criando o botão interativo
     keyboard = [
         [
             InlineKeyboardButton(
@@ -24,13 +32,12 @@ async def inline_query(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Montando a resposta inline com a foto e o botão
     results = [
         InlineQueryResultPhoto(
             id=str(uuid.uuid4()),
             photo_url=URL_DA_IMAGEM,
             thumbnail_url=URL_DA_IMAGEM,
-            caption="",  # Legenda vazia para manter o visual limpo
+            caption="",
             reply_markup=reply_markup
         )
     ]
@@ -39,7 +46,9 @@ async def inline_query(update, context):
 
 def main():
     if not TOKEN:
-        raise ValueError("O token do Telegram não foi configurado nas variáveis de ambiente.")
+        raise ValueError("O token do Telegram nao foi configurado.")
+
+    Thread(target=run_server, daemon=True).start()
 
     app = Application.builder().token(TOKEN).build()
     app.add_handler(InlineQueryHandler(inline_query))
