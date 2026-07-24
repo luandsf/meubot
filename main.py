@@ -1,58 +1,50 @@
 import os
-from threading import Thread
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-# Servidor simples para manter o Render Free ativo
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Bot esta ativo!")
+# Configuração de Logs
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-def run_server():
-    port = int(os.environ.get("PORT", 8080))
-    server = HTTPServer(('0.0.0.0', port), SimpleHTTPRequestHandler)
-    server.serve_forever()
+# Link direto da imagem
+PHOTO_URL = "https://i.im.ge/2026/07/23/QMbyySK.983f7348-d9bf-4ed7-8258-f540bd437f8c.png"
 
-# Dados do bot
-TOKEN = os.environ.get("TELEGRAM_TOKEN")
-LINK_DO_GRUPO = "https://t.me/tipslucrativas1"
+# Link do seu grupo do Telegram
+GROUP_LINK = "https://t.me/tipslucrativas1"
 
-# URL direta e estável da imagem
-URL_DA_IMAGEM = "https://i.postimg.cc/m2SThn2T/image.png"
-
-# Função acionada quando o usuário envia /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    caption_text = (
+        "Parabéns!! Você foi selecionado para acessar o grupo gratuito, "
+        "clique abaixo e aproveite!! ⬇️"
+    )
+
     keyboard = [
-        [
-            InlineKeyboardButton(
-                "CLIQUE AQUI E ACESSE O GRUPO GRATUITO ↗️", 
-                url=LINK_DO_GRUPO
-            )
-        ]
+        [InlineKeyboardButton("ENTRAR NO GRUPO GRATUITO 🚀", url=GROUP_LINK)]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await context.bot.send_photo(
         chat_id=update.effective_chat.id,
-        photo=URL_DA_IMAGEM,
-        caption="",
+        photo=PHOTO_URL,
+        caption=caption_text,
         reply_markup=reply_markup
     )
 
 def main():
-    if not TOKEN:
-        raise ValueError("O token do Telegram nao foi configurado.")
+    token = os.environ.get("TELEGRAM_TOKEN")
+    
+    if not token:
+        raise ValueError("A variável TELEGRAM_TOKEN não foi encontrada!")
 
-    Thread(target=run_server, daemon=True).start()
+    app = ApplicationBuilder().token(token).build()
 
-    app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
 
     print("Bot rodando e aguardando /start...")
     app.run_polling()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
