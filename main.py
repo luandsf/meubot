@@ -20,8 +20,8 @@ def run_server():
 TOKEN = os.environ.get("TELEGRAM_TOKEN")
 LINK_DO_GRUPO = "https://t.me/tipslucrativas1"
 
-# Link permanente da imagem hospedada no Telegram
-URL_DA_IMAGEM = "https://t.me/imagembott/2?single"
+# URL direta e estável da imagem
+URL_DA_IMAGEM = "https://i.postimg.cc/m2SThn2T/image.png"
 
 # Função acionada quando o usuário envia /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -35,7 +35,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Enviando a foto com o botão embutido
     await context.bot.send_photo(
         chat_id=update.effective_chat.id,
         photo=URL_DA_IMAGEM,
