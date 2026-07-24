@@ -9,10 +9,10 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# Link direto da imagem
-PHOTO_URL = "https://i.im.ge/2026/07/23/QMbyySK.983f7348-d9bf-4ed7-8258-f540bd437f8c.png"
+# Imagem local salva no GitHub
+PHOTO_PATH = "banner.png"
 
-# Link do seu grupo do Telegram
+# Link do seu grupo
 GROUP_LINK = "https://t.me/tipslucrativas1"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -26,12 +26,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await context.bot.send_photo(
-        chat_id=update.effective_chat.id,
-        photo=PHOTO_URL,
-        caption=caption_text,
-        reply_markup=reply_markup
-    )
+    if os.path.exists(PHOTO_PATH):
+        with open(PHOTO_PATH, 'rb') as photo_file:
+            await context.bot.send_photo(
+                chat_id=update.effective_chat.id,
+                photo=photo_file,
+                caption=caption_text,
+                reply_markup=reply_markup
+            )
+    else:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=caption_text,
+            reply_markup=reply_markup
+        )
 
 def main():
     token = os.environ.get("TELEGRAM_TOKEN")
