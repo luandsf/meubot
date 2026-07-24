@@ -9,7 +9,10 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# Link do seu grupo
+# Link direto do arquivo de imagem hospedado no ImgBB
+PHOTO_URL = "https://i.ibb.co/sD9yB4p/banner.png"
+
+# Link do seu grupo do Telegram
 GROUP_LINK = "https://t.me/tipslucrativas1"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,10 +26,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Envia a mensagem direta com o botão
-    await context.bot.send_message(
+    # Envia a foto com a legenda e botão
+    await context.bot.send_photo(
         chat_id=update.effective_chat.id,
-        text=caption_text,
+        photo=PHOTO_URL,
+        caption=caption_text,
         reply_markup=reply_markup
     )
 
