@@ -19,11 +19,12 @@ def run_server():
 # Dados do bot
 TOKEN = os.environ.get("TELEGRAM_TOKEN")
 LINK_DO_GRUPO = "https://t.me/tipslucrativas1"
-URL_DA_IMAGEM = "https://i.imgur.com/vH9XgGj.png"
+
+# Link permanente da imagem hospedada no Telegram
+URL_DA_IMAGEM = "https://t.me/imagembott/2?single"
 
 # Função acionada quando o usuário envia /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Criando o botão com o link do grupo
     keyboard = [
         [
             InlineKeyboardButton(
@@ -34,11 +35,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Enviando a imagem com o botão anexado
+    # Enviando a foto com o botão embutido
     await context.bot.send_photo(
         chat_id=update.effective_chat.id,
         photo=URL_DA_IMAGEM,
-        caption="",  # Legenda vazia para manter o visual limpo
+        caption="",
         reply_markup=reply_markup
     )
 
@@ -46,13 +47,9 @@ def main():
     if not TOKEN:
         raise ValueError("O token do Telegram nao foi configurado.")
 
-    # Inicia o servidor HTTP em segundo plano para o Render
     Thread(target=run_server, daemon=True).start()
 
-    # Configura o bot
     app = Application.builder().token(TOKEN).build()
-    
-    # Escuta o comando /start
     app.add_handler(CommandHandler("start", start))
 
     print("Bot rodando e aguardando /start...")
